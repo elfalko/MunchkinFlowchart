@@ -1,0 +1,97 @@
+
+% Define block styles
+\tikzstyle{decision} = [diamond, draw, text width=7em, text badly centered, inner sep=0pt]
+\tikzstyle{block} = [rectangle, draw, text width=7em, text centered, minimum height=4em]
+\tikzstyle{rounded} = [block, rounded corners]
+\tikzstyle{line} = [draw, -latex']
+    
+\begin{tikzpicture}[node distance = 1cm and 2cm, auto]
+    % Place nodes
+    \node [block] (init) {\textbf{Zuganfang}};
+    \node [rounded, below=of init] (do1) {(Karten spielen)};
+    \node [rounded, below=of do1] (door) {\textbf{T\"ur eintreten}\\T\"urkarte aufdecken};
+
+    \node [block, below=of door] (trap) {\textbf{Falle/Fluch}\\trifft dich};
+    \node [block, left=of trap] (monster) {\textbf{Monster} bek\"ampfen};
+    \node [block, right=of trap] (crass) {\textbf{Klasse/Rasse}\\du nimmst sie an};
+    \node [block, right=of crass] (other) {\textbf{Alles andere}\\auf die Hand nehmen};
+
+    \node [rounded, below=3 of monster] (help) {Um Hilfe bitten};
+    \node [rounded, below=of help] (fight) {\textbf{Kampf}};
+    \node [decision, below=of fight] (eval) {Level + Items \\\textbf{$>$}\\ Monster Level};
+    \node [block, below=of eval] (loot) {\textbf{Sieg}\\Pl\"undern \& Leveln};
+
+    \node [decision, below=of trap] (beef) {\textbf{Bist du auf \"Arger aus?}};
+
+    \node [rounded, below=of beef, right=of fight] (newmon) {Monster von der Hand spielen};
+    \node [rounded, right=of eval, below=2.05 of newmon] (do2) {Karten spielen (alle)};
+    \node [decision, below=1.2 of do2] (run) {\textbf{Flucht}\\weglaufen w\"urfeln};
+    \node [block, below=of run] (bad) {\textbf{Schlimme Dinge}\\treffen dich};
+    \node [rounded, right=of newmon] (search) {\textbf{Raum durchsuchen}\\Ziehe verdeckte T\"urkarte auf die Hand};
+    
+    \node [rounded, below=of bad] (do3) {(Karten spielen)};
+    \node [rounded, below=of do3] (do4) {Handkarten reduzieren};
+
+    \node [rounded, below=of do4] (end) {\textbf{Zugende}};
+
+    \node [rounded, right=5 of run] (cheat) {\textbf{Schummeln}};
+    \node [rounded, below=of cheat] (nocheat) {\textbf{Checken das kein anderer schummelt}};
+
+    % Draw edges
+    \path [line] (init) -- (do1);
+    \path [line] (do1) -- (door);
+    \path [line] (door) -| (monster);
+    \path [line] (door) -- (trap);
+    \path [line] (door) -| (other);
+    \path [line] (door) -| (crass);
+    \path [line] (monster) -- (help);
+    \path [line] (help) -- (fight);
+    \path [line] (fight) -- (eval);
+
+    \path [line] (eval.south east) -| node [near start, below] {Nein, aber ...} (do2);
+    \path [line] (do2.north) |- (eval.north east);
+
+    \path [line] (trap) -- (beef);
+    \path [line] (crass.south) -- +(0,-1);
+    \path [line] (other.south) |- +(-8,-1) -- (beef.north east);
+    \path [line] (beef) -- node [] {ja} (newmon);
+    \path [line] (newmon.south) |- +(-2.4,-0.5) |- (help);
+    \path [line] (beef.south east) -- +(0.7,-0.7) -| node [near start, above] {nein} (search);
+    \path [line] (eval) -- node [] {ja} (loot);
+    \path [line] (eval.south east) -- +(0.9,-0.9) -- node [below] {Nein} +(2.2,-0.9) -- (run);
+
+    \path [line] (run) -- node [] {$<$5} (bad);
+    \path [line] (run.south west) -- +(-0.8,-0.8) -- node [left] {$\geq$5} +(-0.8,-4) -- (do3.north west);
+
+    \path [line] (bad) -- (do3);
+    \path [line] (loot) |- (do3);
+    \path [line] (search) |- (do3);
+    \path [line] (do3) -- (do4);
+    \path [line] (do4) -- (end);
+
+    \path [line] (cheat) -- (nocheat);
+    \path [line] (nocheat.south) |- +(2,-0.5) |- +(0,4.5) -- (cheat.north);
+
+\end{tikzpicture}
+
+\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+    \node [block] (init) {initialize model};
+    \node [cloud, left of=init] (expert) {expert};
+    \node [cloud, right of=init] (system) {system};
+    \node [block, below of=init] (identify) {identify candidate models};
+    \node [block, below of=identify] (evaluate) {evaluate candidate models};
+    \node [block, left of=evaluate, node distance=3cm] (update) {update model};
+    \node [decision, below of=evaluate] (decide) {is best candidate better?};
+    \node [block, below of=decide, node distance=3cm] (stop) {stop};
+    % Draw edges
+    \path [line] (init) -- (identify);
+    \path [line] (identify) -- (evaluate);
+    \path [line] (evaluate) -- (decide);
+    \path [line] (decide) -| node [near start] {yes} (update);
+    \path [line] (update) |- (identify);
+    \path [line] (decide) -- node {no}(stop);
+    \path [line,dashed] (expert) -- (init);
+    \path [line,dashed] (system) -- (init);
+    \path [line,dashed] (system) |- (evaluate);
+\end{tikzpicture}
