@@ -3,10 +3,10 @@ all:
 	make clean
 
 build:
-	pdflatex main
+	pdflatex MunchkinFlowchart 
 
 clean:
 	rm -rf *.aux *.log *.mt0 *.mtc* *.toc *.idx *.ilg 
 
 show:
-	okular main.pdf
+	okular MunchkinFlowchart.pdf
